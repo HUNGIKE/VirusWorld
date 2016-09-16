@@ -53,14 +53,13 @@ void executePayload(){
 void putRawFile(FILE* f_append,char* rawFile,int sizeOfImage){
 	
    		FILE* f_rawimage=fopen(rawFile, "rb");
-		int rch=0,rch_sum=0; char buffer[25600];
+		int rch=0; char buffer[25600];
     	while( ( rch=fread(buffer,sizeof(char),sizeof(buffer),f_rawimage) )>0) {
-    		rch_sum+=rch;
-    		if(rch_sum>=sizeOfImage){
-    			rch-=(rch_sum-sizeOfImage);
-			}
+    		if( rch>=sizeOfImage )rch=sizeOfImage;
         	fwrite(buffer,sizeof(char),rch,f_append);
-        	if(rch_sum>=sizeOfImage)break;
+        	
+        	sizeOfImage-=rch;
+        	if(sizeOfImage==0)break;
    		}
    		fclose(f_rawimage);
 }
